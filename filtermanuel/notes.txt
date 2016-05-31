@@ -1,0 +1,9 @@
+python script to calculate intersection of monster manuel list and easyfax list
+resulting list should be in monster manuel order and format.
+monster names are more important, area names and separator lines are nice to have
+	only including area names and separator lines if there are monsters in that area would be even better
+
+some other notes:
+only check monster name, not research level in the brackets
+test specifically for how fancy characters are handled (though python should be cool with this)
+
