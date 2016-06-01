@@ -3,7 +3,7 @@
 #    py.test tests/test_filtermanuel.py
 
 import pytest
-# import filtermanuel as fm
+import filtermanuel as fm
 
 
 def test_should_copy():
