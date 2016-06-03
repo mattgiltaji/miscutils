@@ -8,9 +8,16 @@
 
 import re
 
-SECTION_SEPARATOR_REGEX = '^=====*$'
-# this regex should match the section separator.
+SECTION_SEPARATOR_REGEX = r'^=====*$'
+# This regex should match the section separator.
 # Why 5 equal signs? entirely arbitrary
+SECTION_HEADER_REGEX = r'^\[[A-Z].*\s+.+\]$'
+# This regex should match the name of an area, enclosed in square brackets
+# Why is it so nasty? Kol lets a lot of things be in the area name
+# Including punctuation, spaces, alphanumerics, non-ascii
+# I've settled on an uppercase letter followed by other chars, with a space
+#  somewhere in it, the whole thing in square brackets
+# If it breaks, add more test scenarios and good luck
 
 
 def should_copy(contents):
@@ -26,4 +33,10 @@ def should_copy(contents):
     :return: Boolean indicating the line should be copied to output
     """
 
-    return re.match(SECTION_SEPARATOR_REGEX, contents)
+    # Make a few calls with simpler regexes for clarity
+    # As opposed to a single call with a complex regex
+    if re.match(SECTION_SEPARATOR_REGEX, contents) \
+            or re.match(SECTION_HEADER_REGEX, contents):
+        return True
+
+    return False
