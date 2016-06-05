@@ -33,11 +33,31 @@ class TestShouldCopy:
         assert fm.should_copy("[The Gourd!]")
         assert fm.should_copy("[LavaCo™ Lamp Factory]")
         assert fm.should_copy("[A Deserted Stretch of I-911]")
-        # fake areas to test regex bounds
-        assert not fm.should_copy("[a]")
-        assert not fm.should_copy("[urmom]")
-        assert not fm.should_copy("[aarht shgthde aetgfgd]")
 
     def test_dont_copy_bad_area_name(self):
         assert not fm.should_copy("[]")
         assert not fm.should_copy("[ ]")
+        # fake areas to test regex bounds
+        assert not fm.should_copy("[a]")
+        assert not fm.should_copy("[urmom]")
+        assert not fm.should_copy("[Urmom]")
+        assert not fm.should_copy("[aarht shgthde aetgfgd]")
+
+    def test_copy_matching_monster(self):
+        file_contents = ("Monster", "Monster'1", "Monster 2", "Monster.37",
+                         "monster-dash", "comma, the monster")
+        assert fm.should_copy("Monster", file_contents)
+        assert fm.should_copy("Monster 2", file_contents)
+        assert fm.should_copy("Monster'1", file_contents)
+        assert fm.should_copy("comma, the monster", file_contents)
+        assert fm.should_copy("monster-dash", file_contents)
+        assert fm.should_copy("Monster.37", file_contents)
+
+    def test_dont_copy_nonmatching_monster(self):
+        file_contents = ("Monster", "Monster'1", "Monster 2", "Monster.37",
+                         "monster-dash", "comma, the monster")
+        assert not fm.should_copy("monster", file_contents)
+        assert not fm.should_copy("yolo", file_contents)
+        assert not fm.should_copy("comma, ", file_contents)
+        assert not fm.should_copy("-dash", file_contents)
+        assert not fm.should_copy("37", file_contents)
