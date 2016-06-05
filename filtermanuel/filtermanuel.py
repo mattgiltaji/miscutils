@@ -20,23 +20,28 @@ SECTION_HEADER_REGEX = r'^\[[A-Z].*\s+.+\]$'
 # If it breaks, add more test scenarios and good luck
 
 
-def should_copy(contents):
-    """ Returns true if contents should be copied to output file
+def should_copy(string, contents=()):
+    """ Returns true if string should be copied to output file
 
     3 types of lines should return true:
-    A) a monster that matches a line in the faxbot list
+    A) a monster that matches a line in contents
     B) a section header - [foo bar]
     C) a section divider - =====...===
     We don't necessarily evaluate these in order, we try the easy ones first
 
-    :param str contents: data that will be checked
+    :param str string: data to search for
+    :param list contents: search space
     :return: Boolean indicating the line should be copied to output
     """
 
     # Make a few calls with simpler regexes for clarity
     # As opposed to a single call with a complex regex
-    if re.match(SECTION_SEPARATOR_REGEX, contents) \
-            or re.match(SECTION_HEADER_REGEX, contents):
+    if re.match(SECTION_SEPARATOR_REGEX, string) \
+            or re.match(SECTION_HEADER_REGEX, string):
         return True
 
+    # Now the huge loop. We might need to optimize this later.
+    for line in contents:
+        if string == line:
+            return True
     return False
