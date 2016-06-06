@@ -61,3 +61,17 @@ class TestShouldCopy:
         assert not fm.should_copy("comma, ", file_contents)
         assert not fm.should_copy("-dash", file_contents)
         assert not fm.should_copy("37", file_contents)
+
+
+class TestGetFileContents:
+    def test_get_blank_file_contents(self):
+        pass
+
+    def test_error_on_bad_filename(self):
+        pass
+
+    def test_get_big_file_contents(self):
+        pass
+
+    def test_get_small_file_contents(self):
+        pass
