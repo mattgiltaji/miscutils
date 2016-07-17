@@ -5,8 +5,8 @@
 #   Find the matching monsters in a faxbot list
 #   Output the list of matches (in manuel order) into an output file
 #   We would also like to preserve area headings from manuel in the output
-
 import re
+import sys
 
 SECTION_SEPARATOR_REGEX = r'^=====*$'
 # This regex should match the section separator.
@@ -45,3 +45,26 @@ def should_copy(string, contents=()):
         if string == line:
             return True
     return False
+
+
+def parse_args(args):
+    """
+    Parses and validates command line arguments
+    :param list args: arguments passed into the script (usually sys.argv[1:])
+    :return: arguments parsed into a neat object
+    """
+    pass
+
+
+def main():
+    """
+    Call parse_args, then pass to filter_manuel() fo do all the work
+    :return: nothing
+    """
+    args = parse_args(sys.argv[1:])
+    # filter_manuel()
+    pass
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()
