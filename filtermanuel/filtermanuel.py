@@ -31,7 +31,7 @@ def should_copy(string, contents=()):
 
     :param str string: data to search for
     :param list contents: search space
-    :return: Boolean indicating the line should be copied to output
+    :return Boolean: whether the line should be copied to output or not
     """
 
     # Make a few calls with simpler regexes for clarity
@@ -45,6 +45,27 @@ def should_copy(string, contents=()):
         if string == line:
             return True
     return False
+
+
+def get_file_contents(path_to_file):
+    """
+    Reads a file from the filesystem and returns its contents all at once
+    :param str path_to_file:
+    :return list: contents of the file, line by line
+    """
+    pass
+
+
+def filter_manuel():
+    # manuel = get_file_contents(manuel_location)
+    # faxbot = get_file_contents(faxbot_location)
+    # open output file in write mode
+    # for x in faxbot:
+    #     if should_copy(x, manuel)
+    #          write x in output file
+    # close all the files
+    pass
+
 
 
 def parse_args(args):
