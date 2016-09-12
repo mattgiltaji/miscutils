@@ -53,7 +53,8 @@ def get_file_contents(path_to_file):
     :param str path_to_file:
     :return list: contents of the file, line by line
     """
-    pass
+    with open(path_to_file, 'r') as f:
+        return f.readlines()
 
 
 def filter_manuel():
