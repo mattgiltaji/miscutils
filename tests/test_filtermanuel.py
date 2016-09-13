@@ -167,7 +167,7 @@ class TestMain:
         faxbot_file = path.join(test_dir, 'faxbot.txt')
         expected_file = path.join(test_dir, 'expected.txt')
 
-        arg_string = "foo.py {mf} {ff} {of}".format(
+        arg_string = "filtermanuel.py {mf} {ff} {of}".format(
             mf=manuel_file, ff=faxbot_file, of=output_file)
 
         mocker.patch('sys.argv', arg_string.split())
@@ -186,8 +186,6 @@ class TestMain:
         manuel_file = path.join(real_dir, 'monster manuel.txt')
         faxbot_file = path.join(real_dir, 'faxbot.txt')
 
-        arg_string = "foo.py '{mf}' '{ff}' '{of}'".format(
-            mf=manuel_file, ff=faxbot_file, of=output_file)
-
-        mocker.patch('sys.argv', arg_string.split())
+        args = ["filtermanuel.py", manuel_file, faxbot_file, output_file]
+        mocker.patch('sys.argv', args)
         fm.main()
