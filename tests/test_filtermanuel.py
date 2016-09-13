@@ -119,8 +119,8 @@ class TestFilterManuel:
         faxbot_file = path.join(test_dir, 'faxbot.txt')
         expected_file = path.join(test_dir, 'expected.txt')
 
-        fm.filter_manuel(manuel_file=manuel_file, faxbot_file=faxbot_file,
-                         output_file=actual_file)
+        fm.filter_manuel(manuel_path=manuel_file, faxbot_path=faxbot_file,
+                         output_path=actual_file)
 
         with open(expected_file, 'r') as ef:
             expected = ef.readlines()
