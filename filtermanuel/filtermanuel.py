@@ -5,8 +5,10 @@
 #   Find the matching monsters in a faxbot list
 #   Output the list of matches (in manuel order) into an output file
 #   We would also like to preserve area headings from manuel in the output
+import argparse
 import re
 import sys
+
 
 SECTION_SEPARATOR_REGEX = r'^=====*$'
 # This regex should match the section separator.
@@ -83,7 +85,17 @@ def parse_args(args):
     :param list args: arguments passed into the script (usually sys.argv[1:])
     :return: arguments parsed into a neat object
     """
-    pass
+    parser = argparse.ArgumentParser(
+        description='Filter the lines in a monster manuel data file by what '
+                    'also exists in a faxbot data file and write it '
+                    'to an output file')
+    parser.add_argument('manuel', type=argparse.FileType('r'),
+                        help='filepath to the monster manuel data file')
+    parser.add_argument('faxbot', type=argparse.FileType('r'),
+                        help='filepath to the faxbot data file')
+    parser.add_argument('output', type=argparse.FileType('w'),
+                        help='filepath where the output data should be written')
+    return parser.parse_args(args)
 
 
 def main():
