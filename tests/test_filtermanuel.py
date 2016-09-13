@@ -156,4 +156,39 @@ class TestParseArgs:
         assert 'output' in err
 
 
+class TestMain:
+    @pytest.mark.parametrize("test_dir", [
+        no_matches_dir, some_matches_dir, all_matches_dir,
+    ])
+    def test_main(self, tmpdir, test_dir, mocker):
+        output_file = str(tmpdir.join('filtered_manuel.txt'))
+        manuel_file = path.join(test_dir, 'manuel.txt')
+        faxbot_file = path.join(test_dir, 'faxbot.txt')
+        expected_file = path.join(test_dir, 'expected.txt')
+
+        arg_string = "foo.py {mf} {ff} {of}".format(
+            mf=manuel_file, ff=faxbot_file, of=output_file)
+
+        mocker.patch('sys.argv', arg_string.split())
+        fm.main()
+
+        with open(expected_file, 'r') as ef:
+            expected = ef.readlines()
+        with open(output_file, 'r') as of:
+            actual = of.readlines()
+
+        assert expected == actual
+
+    def test_real(self, mocker):
+        real_dir = path.abspath(r'C:\Users\admin\Desktop\kolmafia\samples')
+        output_file = path.join(real_dir, 'filtered_manuel.txt')
+        manuel_file = path.join(real_dir, 'monster manuel.txt')
+        faxbot_file = path.join(real_dir, 'faxbot.txt')
+
+        arg_string = "foo.py '{mf}' '{ff}' '{of}'".format(
+            mf=manuel_file, ff=faxbot_file, of=output_file)
+
+        mocker.patch('sys.argv', arg_string.split())
+        fm.main()
+
 
