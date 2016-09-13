@@ -61,16 +61,20 @@ def get_file_contents(path_to_file):
         return f.readlines()
 
 
-def filter_manuel(manuel_file, faxbot_file, output_file):
-    manuel = get_file_contents(manuel_file)
-    faxbot = get_file_contents(faxbot_file)
-    with open(output_file, 'w') as output:
+def filter_manuel(manuel_path, faxbot_path, output_path):
+    """
+    Copies lines from manuel to output, provided the line is also in faxbot
+    :param manuel_path: path to the file with manuel data
+    :param faxbot_path: path to the file with faxbot data
+    :param output_path: path to file that will hold the filtered data
+    :return: None, but writes files as a side effect
+    """
+    manuel = get_file_contents(manuel_path)
+    faxbot = get_file_contents(faxbot_path)
+    with open(output_path, 'w') as output:
         for line in manuel:
             if should_copy(line, faxbot):
                 output.write(line)
-
-
-
 
 
 def parse_args(args):
@@ -88,7 +92,9 @@ def main():
     :return: nothing
     """
     args = parse_args(sys.argv[1:])
-    # filter_manuel()
+    filter_manuel(manuel_path=args.manuel,
+                  faxbot_path=args.faxbot,
+                  output_path=args.output)
     pass
 
 
