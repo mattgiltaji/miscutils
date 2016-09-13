@@ -130,7 +130,6 @@ class TestFilterManuel:
         assert expected == actual
 
 
-@pytest.mark.lol
 class TestParseArgs:
     @pytest.mark.parametrize("test_dir", [
         no_matches_dir, some_matches_dir, all_matches_dir,
