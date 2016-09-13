@@ -80,6 +80,13 @@ class TestShouldCopy:
     def test_dont_copy_nonmatching_monster(self, test_input):
         assert not fm.should_copy(test_input, fake_monster_file_contents)
 
+    @pytest.mark.parametrize("test_input", [
+        "Monster {1}", "Monster 2 {3}", "Monster'1 {2}",
+        "comma, the monster {3}", "monster-dash {2}", "Monster.37 {1}",
+    ])
+    def test_copy_matching_monster_with_brackets(self, test_input):
+        assert fm.should_copy(test_input, fake_monster_file_contents)
+
 
 class TestGetFileContents:
     def test_get_blank_file_contents(self):
