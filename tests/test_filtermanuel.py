@@ -15,6 +15,7 @@ small_file = path.join(basic_test_dir, 'small.txt')
 blank_file = path.join(basic_test_dir, 'blank.txt')
 big_file = path.join(basic_test_dir, 'big.txt')
 not_exist_file = path.join(basic_test_dir, 'not_exist.txt')
+no_matches_dir = path.join(test_data_dir, 'copy_nothing')
 
 
 # hardcoding fun
@@ -70,7 +71,7 @@ class TestShouldCopy:
         assert fm.should_copy(test_input, fake_monster_file_contents)
 
     @pytest.mark.parametrize("test_input", [
-        "monster", "yolo", "comma, ", "-dash", "37",
+        "monster", "yolo", "comma, ", "-dash", "37", "Monst",
     ])
     def test_dont_copy_nonmatching_monster(self, test_input):
         assert not fm.should_copy(test_input, fake_monster_file_contents)
@@ -97,3 +98,21 @@ class TestGetFileContents:
         for x in range(0,10):
             assert "line{0:02d}\n".format(x) in results
         assert "line11\n" not in results
+
+
+class TestFilterManuel:
+    def test_no_matches_found(self, tmpdir):
+        actual_file = tmpdir.join('filtered_manuel.txt')
+        manuel_file = path.join(no_matches_dir, 'manuel.txt')
+        faxbot_file = path.join(no_matches_dir, 'faxbot.txt')
+        expected_file = path.join(no_matches_dir, 'faxbot.txt')
+
+        fm.filter_manuel(manuel_file=manuel_file, faxbot_file=faxbot_file,
+                         output_file=actual_file)
+
+        with open(expected_file, 'r') as ef:
+            expected = ef.readlines()
+        with open(actual_file, 'r') as af:
+            actual = af.readlines()
+
+        assert expected == actual
