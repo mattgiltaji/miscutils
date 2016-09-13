@@ -23,6 +23,8 @@ fake_monster_file_contents = ("Monster", "Monster'1", "Monster 2", "Monster.37",
                               "monster-dash", "comma, the monster")
 
 
+
+
 class TestShouldCopy:
     @pytest.mark.parametrize("test_input", [
         "=================================",  # real line
@@ -102,7 +104,7 @@ class TestGetFileContents:
 
 class TestFilterManuel:
     def test_no_matches_found(self, tmpdir):
-        actual_file = tmpdir.join('filtered_manuel.txt')
+        actual_file = str(tmpdir.join('filtered_manuel.txt'))
         manuel_file = path.join(no_matches_dir, 'manuel.txt')
         faxbot_file = path.join(no_matches_dir, 'faxbot.txt')
         expected_file = path.join(no_matches_dir, 'faxbot.txt')
