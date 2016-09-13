@@ -107,7 +107,7 @@ class TestFilterManuel:
         actual_file = str(tmpdir.join('filtered_manuel.txt'))
         manuel_file = path.join(no_matches_dir, 'manuel.txt')
         faxbot_file = path.join(no_matches_dir, 'faxbot.txt')
-        expected_file = path.join(no_matches_dir, 'faxbot.txt')
+        expected_file = path.join(no_matches_dir, 'expected.txt')
 
         fm.filter_manuel(manuel_file=manuel_file, faxbot_file=faxbot_file,
                          output_file=actual_file)
