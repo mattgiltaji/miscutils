@@ -93,7 +93,7 @@ def parse_args(args):
                         help='filepath to the monster manuel data file')
     parser.add_argument('faxbot',
                         help='filepath to the faxbot data file')
-    parser.add_argument('output', 
+    parser.add_argument('output',
                         help='filepath where the output data should be written')
     return parser.parse_args(args)
 
@@ -107,7 +107,6 @@ def main():
     filter_manuel(manuel_path=args.manuel,
                   faxbot_path=args.faxbot,
                   output_path=args.output)
-    pass
 
 
 if __name__ == "__main__":  # pragma: no cover
