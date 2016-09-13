@@ -58,15 +58,13 @@ def get_file_contents(path_to_file):
 
 
 def filter_manuel(manuel_file, faxbot_file, output_file):
-    # manuel = get_file_contents(manuel_location)
-    # faxbot = get_file_contents(faxbot_location)
-    # open output file in write mode
-    # for x in manuel:
-    #     if should_copy(x, faxbot)
-    #          write x in output file
-    # close all the files
+    manuel = get_file_contents(manuel_file)
+    faxbot = get_file_contents(faxbot_file)
     with open(output_file, 'w') as output:
-        pass
+        for line in manuel:
+            if should_copy(line, faxbot):
+                output.write(line)
+
 
 
 
