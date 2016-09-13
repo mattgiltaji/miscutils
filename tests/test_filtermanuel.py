@@ -128,3 +128,33 @@ class TestFilterManuel:
             actual = af.readlines()
 
         assert expected == actual
+
+
+@pytest.mark.lol
+class TestParseArgs:
+    @pytest.mark.parametrize("test_dir", [
+        no_matches_dir, some_matches_dir, all_matches_dir,
+    ])
+    def test_arg_parsing(self, tmpdir, test_dir):
+        output_file = str(tmpdir.join('filtered_manuel.txt'))
+        manuel_file = path.join(test_dir, 'manuel.txt')
+        faxbot_file = path.join(test_dir, 'faxbot.txt')
+        arg_string = manuel_file + " " + faxbot_file + " " + output_file
+
+        results = fm.parse_args(arg_string.split())
+
+        assert manuel_file == results.manuel
+        assert faxbot_file == results.faxbot
+        assert output_file == results.output
+
+    def test_parse_args_mandatory_fields(self, capsys):
+        with pytest.raises(SystemExit) as excinfo:
+            fm.parse_args([])
+        out, err = capsys.readouterr()
+        assert 2 == excinfo.value.code
+        assert 'manuel' in err
+        assert 'faxbot' in err
+        assert 'output' in err
+
+
+
