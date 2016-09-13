@@ -21,15 +21,15 @@ all_matches_dir = path.join(test_data_dir, 'copy_everything')
 
 
 # hardcoding fun
-fake_monster_file_contents = ("Monster", "Monster'1", "Monster 2", "Monster.37",
-                              "monster-dash", "comma, the monster")
+fake_monster_file_contents = ["Monster", "Monster'1", "Monster 2", "Monster.37",
+                              "monster-dash", "comma, the monster"]
 
 
 class TestShouldCopy:
     @pytest.mark.parametrize("test_input", [
         "=================================",  # real line
         "=====================================",  # longer
-        "==========",# arbitrarily short but valid
+        "==========",  # arbitrarily short but valid
         "====",  # shortest possible valid
     ])
     def test_copy_separator(self, test_input):
@@ -42,7 +42,7 @@ class TestShouldCopy:
         "----=======-----",  # nope
         "============================-",  # no dash
     ])
-    def test_dont_copy_bad_separator(self,test_input):
+    def test_dont_copy_bad_separator(self, test_input):
         assert not fm.should_copy(test_input)
 
     @pytest.mark.parametrize("test_input", [
@@ -94,17 +94,18 @@ class TestGetFileContents:
     def test_error_on_bad_filename(self):
         with pytest.raises(FileNotFoundError) as excinfo:
             fm.get_file_contents(not_exist_file)
+        assert 'No such file or directory' in excinfo.value.strerror
 
     def test_get_big_file_contents(self):
         results = fm.get_file_contents(big_file)
         assert len(results) == 5001
-        for x in range(0,5000):
+        for x in range(0, 5000):
             assert "this is a much longer line{0:04d}\n".format(x) in results
 
     def test_get_small_file_contents(self):
         results = fm.get_file_contents(small_file)
         assert len(results) == 11
-        for x in range(0,10):
+        for x in range(0, 10):
             assert "line{0:02d}\n".format(x) in results
         assert "line11\n" not in results
 
@@ -190,5 +191,3 @@ class TestMain:
 
         mocker.patch('sys.argv', arg_string.split())
         fm.main()
-
-
