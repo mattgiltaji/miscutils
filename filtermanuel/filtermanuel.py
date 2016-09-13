@@ -18,6 +18,9 @@ SECTION_HEADER_REGEX = r'^\[[A-Z].*\s+.+\]$'
 # I've settled on an uppercase letter followed by other chars, with a space
 #  somewhere in it, the whole thing in square brackets
 # If it breaks, add more test scenarios and good luck
+ENDING_BRACKETS_REGEX = r' \{[0-3]\}$'
+# This regex should match the {0} {1} {2} {3} line suffix in the monster manual
+# In the monster manual, the number in the {} is how many factoids are missing
 
 
 def should_copy(string, contents=()):
@@ -41,8 +44,9 @@ def should_copy(string, contents=()):
         return True
 
     # Now the huge loop. We might need to optimize this later.
+    string_without_brackets = re.sub(ENDING_BRACKETS_REGEX, '', string)
     for line in contents:
-        if string == line:
+        if string_without_brackets == line:
             return True
     return False
 

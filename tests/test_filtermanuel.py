@@ -25,8 +25,6 @@ fake_monster_file_contents = ("Monster", "Monster'1", "Monster 2", "Monster.37",
                               "monster-dash", "comma, the monster")
 
 
-
-
 class TestShouldCopy:
     @pytest.mark.parametrize("test_input", [
         "=================================",  # real line
