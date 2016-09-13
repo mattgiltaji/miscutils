@@ -89,11 +89,11 @@ def parse_args(args):
         description='Filter the lines in a monster manuel data file by what '
                     'also exists in a faxbot data file and write it '
                     'to an output file')
-    parser.add_argument('manuel', type=argparse.FileType('r'),
+    parser.add_argument('manuel',
                         help='filepath to the monster manuel data file')
-    parser.add_argument('faxbot', type=argparse.FileType('r'),
+    parser.add_argument('faxbot',
                         help='filepath to the faxbot data file')
-    parser.add_argument('output', type=argparse.FileType('w'),
+    parser.add_argument('output', 
                         help='filepath where the output data should be written')
     return parser.parse_args(args)
 
