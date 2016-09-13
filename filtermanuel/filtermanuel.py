@@ -66,7 +66,7 @@ def filter_manuel(manuel_file, faxbot_file, output_file):
     #          write x in output file
     # close all the files
     with open(output_file, 'w') as output:
-        output.write('yolo')
+        pass
 
 
 
