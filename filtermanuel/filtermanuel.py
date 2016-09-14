@@ -13,12 +13,12 @@ import sys
 SECTION_SEPARATOR_REGEX = r'^=====*$'
 # This regex should match the section separator.
 # Why 5 equal signs? entirely arbitrary
-SECTION_HEADER_REGEX = r'^\[[A-Z].*\s+.+\]$'
+SECTION_HEADER_REGEX = r'^\[[A-Z]+.*\]$'
 # This regex should match the name of an area, enclosed in square brackets
 # Why is it so nasty? Kol lets a lot of things be in the area name
 # Including punctuation, spaces, alphanumerics, non-ascii
-# I've settled on an uppercase letter followed by other chars, with a space
-#  somewhere in it, the whole thing in square brackets
+# I've settled on an uppercase letter followed by other chars,
+# the whole thing in square brackets. Spaces are not mandatory!
 # If it breaks, add more test scenarios and good luck
 ENDING_BRACKETS_REGEX = r' \{[0-3]\}$'
 # This regex should match the {0} {1} {2} {3} line suffix in the monster manual
