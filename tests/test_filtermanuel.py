@@ -53,14 +53,15 @@ class TestShouldCopy:
         "[The Gourd!]",
         "[LavaCo™ Lamp Factory]",
         "[A Deserted Stretch of I-911]",
+        "[Engineering]",  # no space in area name
     ])
     def test_copy_area_name(self, test_input):
         assert fm.should_copy(test_input)
 
     @pytest.mark.parametrize("test_input", [
-        "[]", "[ ]",  # no blanks
+        "[]", "[ ]",  # no blanks alone
         # fake areas to test regex bounds
-        "[a]", "[urmom]", "[Urmom]", "[aarht shgthde aetgfgd]"
+        "[!]", "[*****]",
     ])
     def test_dont_copy_bad_area_name(self, test_input):
         assert not fm.should_copy(test_input)
