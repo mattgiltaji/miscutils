@@ -18,7 +18,10 @@ not_exist_file = path.join(basic_test_dir, 'not_exist.txt')
 no_matches_dir = path.join(test_data_dir, 'copy_nothing')
 some_matches_dir = path.join(test_data_dir, 'copy_some')
 all_matches_dir = path.join(test_data_dir, 'copy_everything')
-
+remove_all_dir = path.join(test_data_dir, 'remove_all')
+remove_some_dir = path.join(test_data_dir, 'remove_some')
+remove_none_dir = path.join(test_data_dir, 'remove_none')
+full_test_dir = path.join(test_data_dir, 'full_test')
 
 # hardcoding fun
 fake_monster_file_contents = ["Monster", "Monster'1", "Monster 2", "Monster.37",
@@ -110,6 +113,22 @@ class TestGetFileContents:
             assert "line{0:02d}\n".format(x) in results
         assert "line11\n" not in results
 
+class TestRemoveBlankAreas:
+    @pytest.mark.parametrize("test_dir", [
+        remove_all_dir, remove_some_dir, remove_none_dir,
+    ])
+    def test_remote_blank_areas(self, test_dir):
+        contents_file = path.join(test_dir, 'contents.txt')
+        expected_file = path.join(test_dir, 'expected.txt')
+        with open(contents_file, 'r') as cf:
+            contents = cf.readlines()
+
+        actual = fm.remove_blank_areas(contents=contents)
+
+        with open(expected_file, 'r') as ef:
+            expected = ef.readlines()
+
+        assert expected == actual
 
 class TestFilterManuel:
     @pytest.mark.parametrize("test_dir", [
@@ -160,7 +179,7 @@ class TestParseArgs:
 
 class TestMain:
     @pytest.mark.parametrize("test_dir", [
-        no_matches_dir, some_matches_dir, all_matches_dir,
+        no_matches_dir, some_matches_dir, all_matches_dir, full_test_dir,
     ])
     def test_main(self, tmpdir, test_dir, mocker):
         output_file = str(tmpdir.join('filtered_manuel.txt'))
@@ -183,7 +202,7 @@ class TestMain:
 
     def test_real(self, mocker):
         real_dir = path.abspath(r'C:\Users\admin\Desktop\kolmafia\samples')
-        output_file = path.join(real_dir, 'filtered_manuel.txt')
+        output_file = path.join(real_dir, 'filtered_faxbot.txt')
         manuel_file = path.join(real_dir, 'monster manuel.txt')
         faxbot_file = path.join(real_dir, 'faxbot.txt')
 
