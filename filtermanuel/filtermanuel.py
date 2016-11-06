@@ -25,7 +25,7 @@ ENDING_BRACKETS_REGEX = r' \{[0-3]\}$'
 # In the monster manual, the number in the {} is how many factoids are missing
 
 
-def should_copy(string, contents=()):
+def should_copy(string, contents=[]):
     """ Returns true if string should be copied to output file
 
     3 types of lines should return true:
@@ -53,6 +53,39 @@ def should_copy(string, contents=()):
     return False
 
 
+def remove_blank_areas(contents=[]):
+    """ Filter contents and remove any lines for blank areas.
+
+    A blank area is defined as a section header followed immediately by a section divider
+
+    :param list contents: search space
+    :return list: contents with blank areas removed
+    """
+    filtered_contents = []
+
+    # iterate manually so we can do lookahead
+    try:
+        it = iter(contents)
+        while True:
+            line = next(it)
+            if re.match(SECTION_HEADER_REGEX, line):
+                # Look at the next line to see if we keep this one
+                next_line = next(it)
+                if re.match(SECTION_SEPARATOR_REGEX, next_line):
+                    # Nope, it's empty, so skip these lines
+                    continue
+                else:
+                    # False alarm, keep these lines
+                    filtered_contents.append(line)
+                    filtered_contents.append(next_line)
+            else:
+                filtered_contents.append(line)
+    except StopIteration:
+        pass
+
+    return filtered_contents
+
+
 def get_file_contents(path_to_file):
     """
     Reads a file from the filesystem and returns its contents all at once
@@ -77,6 +110,11 @@ def filter_manuel(manuel_path, faxbot_path, output_path):
         for line in manuel:
             if should_copy(line, faxbot):
                 output.write(line)
+
+    first_pass_contents = get_file_contents(output_path)
+    second_pass_contents = remove_blank_areas(first_pass_contents)
+    with open(output_path, 'w') as output:
+        output.writelines(second_pass_contents)
 
 
 def parse_args(args):
