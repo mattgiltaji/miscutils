@@ -2,49 +2,58 @@
 # This script encrypts files with gpg, then uploads them to google cloud storage
 # 
 RECIPIENT=matt@giltaji.com
-ORIG_FILE_RAW=$1
-ORIG_FILE="$(echo "${ORIG_FILE_RAW}" | sed -e 's/%y%m%d/'$(date +%y%m%d)'/g')"
-ENCRYPTED_FILE=$ORIG_FILE.gpg
-echo "$ORIG_FILE"
+dir_to_check=$1
 
-if [ ! -e "$ORIG_FILE" ]
+
+encrypt_file() {
+	orig_file=$1
+	
+	encrypted_file=$orig_file.gpg
+	echo "encrypting $orig_file"
+	gpg --encrypt --recipient $RECIPIENT $orig_file
+
+	if [ ! -e "$encrypted_file" ] || [ ! -s "$encrypted_file" ]
+	then
+		echo "encrypted file $encrypted_file not found, aborting."
+		exit 1
+	fi
+
+	echo "$orig_file successfully encrypted. Deleting the original and using $ENCRYPTED_FILE"
+
+	rm $orig_file
+	if [ -e "$orig_file" ]
+	then
+		echo "Unable to delete $orig_file after encrypting, aborting."
+		exit 1
+	fi
+}
+
+upload_files() {
+	location=$1
+	echo "uploading encrypted files from $location"
+	gsutil cp $location/*.gpg gs://matt-server-backups/
+	
+	echo "everything good, deleting local copies"
+	rm $location/*.gpg
+	if [ -e "$location/*.gpg" ]
+	then
+		echo "Unable to delete encrypted files after uploading, aborting."
+		exit 1
+	fi
+}
+
+
+if [ ! -d "$dir_to_check" ]
 then
-	echo "Unable to find file $ORIG_FILE, aborting."
+	echo "Unable to find directory $dir_to_check, aborting."
 	exit 1
 fi
 
-echo "encrypting $ORIG_FILE"
-gpg --encrypt --recipient $RECIPIENT $ORIG_FILE
+for entry in "$dir_to_check"/*.tar.gz
+do
+	encrypt_file $entry
+done
 
-if [ ! -e "$ENCRYPTED_FILE" ] || [ ! -s "$ENCRYPTED_FILE" ]
-then
-	echo "encrypted file $ENCRYPTED_FILE not found, aborting."
-	exit 1
-fi
-
-echo "$ORIG_FILE successfully encrypted. Deleting the original and using $ENCRYPTED_FILE"
-
-rm $ORIG_FILE
-if [ -e "$ORIG_FILE" ]
-then
-	echo "Unable to delete $ORIG_FILE after encrypting, aborting."
-	exit 1
-fi
-
-
-echo "uploading $ENCRYPTED_FILE"
-gsutil cp $ENCRYPTED_FILE gs://matt-server-backups/
-
-echo "upload complete, verifying..."
-#gsutil ls gs://matt-server-backups/$ENCRYPTED_FILE
-
-echo "everything good, deleting local copy of $ENCRYPTED_FILE"
-rm $ENCRYPTED_FILE
-if [ -e "$ENCRYPTED_FILE" ]
-then
-	echo "Unable to delete $ENCRYPTED_FILE after uploading, aborting."
-	exit 1
-fi
-
+upload_files $dir_to_check
 
 exit 0
