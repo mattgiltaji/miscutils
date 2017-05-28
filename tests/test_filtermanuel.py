@@ -202,7 +202,7 @@ class TestMain:
 
     @pytest.mark.real
     def test_real(self, mocker):
-        real_dir = path.abspath(r'C:\Users\admin\Desktop\kolmafia\samples')
+        real_dir = path.abspath(r'D:\Matt\Desktop\kolmafia\samples')
         output_file = path.join(real_dir, 'filtered_faxbot.txt')
         manuel_file = path.join(real_dir, 'monster manuel.txt')
         faxbot_file = path.join(real_dir, 'faxbot.txt')
