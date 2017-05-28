@@ -1,6 +1,6 @@
 # Tests for filtermanuel.py
 # run from miscutils dir as:
-#    py.test tests/test_filtermanuel.py
+#    python -m pytest tests/test_filtermanuel.py
 
 from os import path
 import pytest
