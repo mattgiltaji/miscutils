@@ -8,7 +8,11 @@
 import argparse
 import os
 import sys
+from datetime import datetime, timezone
+from warnings import warn
 from google.cloud import storage
+from tzlocal import get_localzone
+
 
 
 def get_oldest_blob(blobs):
@@ -40,13 +44,18 @@ def validate_giltaji_photos_bucket(bucket):
 
 
 def validate_matt_server_backups_bucket(bucket):
-    # check timestamps on most recent, should be within 8 days of today
-    # check timestamps on oldest, should be within 2 months of today
-    for blob in bucket.list_blobs(fields="items/name,items/time_created"):
-        pass
+    now = get_localzone().localize(datetime.now())
+    newest = get_newest_blob(bucket.list_blobs())
+    newest_age = now - newest.time_created
+    if newest_age.days > 7:
+        warn("The newest file, " + newest.name + ", is more than a week old! Check matt-server-backup cron job.")
+
+    oldest = get_oldest_blob(bucket.list_blobs())
+    oldest_age = now - oldest.time_created
+    if oldest_age.days > 60:
+        warn("The oldest file, " + oldest.name + ", is more than 2 months old! Check matt-server-backup lifecycle delete rules.")
 
     # download most recent 4
-
 
 
 def validate_bucket(bucket):
