@@ -13,7 +13,9 @@ from warnings import warn
 from google.cloud import storage
 from tzlocal import get_localzone
 
-
+SERVER_BACKUP_OLDEST_AGE_IN_DAYS = 60
+SERVER_BACKUP_NEWEST_AGE_IN_DAYS = 7
+NUM_SERVER_BACKUPS_TO_DOWNLOAD = 4
 
 def get_oldest_blob(blobs):
     oldest = None
@@ -47,15 +49,15 @@ def validate_matt_server_backups_bucket(bucket):
     now = get_localzone().localize(datetime.now())
     newest = get_newest_blob(bucket.list_blobs())
     newest_age = now - newest.time_created
-    if newest_age.days > 7:
+    if newest_age.days > SERVER_BACKUP_NEWEST_AGE_IN_DAYS:
         warn("The newest file, " + newest.name + ", is more than a week old! Check matt-server-backup cron job.")
 
     oldest = get_oldest_blob(bucket.list_blobs())
     oldest_age = now - oldest.time_created
-    if oldest_age.days > 60:
+    if oldest_age.days > SERVER_BACKUP_OLDEST_AGE_IN_DAYS:
         warn("The oldest file, " + oldest.name + ", is more than 2 months old! Check matt-server-backup lifecycle delete rules.")
 
-    # download most recent 4
+    # download most recent
 
 
 def validate_bucket(bucket):
