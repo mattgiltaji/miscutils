@@ -25,7 +25,7 @@ ENDING_BRACKETS_REGEX = r' \{[0-3]\}$'
 # In the monster manual, the number in the {} is how many factoids are missing
 
 
-def should_copy(string, contents=[]):
+def should_copy(string, contents=None):
     """ Returns true if string should be copied to output file
 
     3 types of lines should return true:
@@ -38,6 +38,8 @@ def should_copy(string, contents=[]):
     :param list contents: search space
     :return Boolean: whether the line should be copied to output or not
     """
+    if contents is None:
+        contents = []
 
     # Make a few calls with simpler regexes for clarity
     # As opposed to a single call with a complex regex
@@ -53,7 +55,7 @@ def should_copy(string, contents=[]):
     return False
 
 
-def remove_blank_areas(contents=[]):
+def remove_blank_areas(contents=None):
     """ Filter contents and remove any lines for blank areas.
 
     A blank area is defined as a section header followed immediately by a section divider
@@ -61,6 +63,9 @@ def remove_blank_areas(contents=[]):
     :param list contents: search space
     :return list: contents with blank areas removed
     """
+    if contents is None:
+        contents = []
+
     filtered_contents = []
 
     # iterate manually so we can do lookahead

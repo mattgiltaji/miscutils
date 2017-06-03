@@ -113,6 +113,7 @@ class TestGetFileContents:
             assert "line{0:02d}\n".format(x) in results
         assert "line11\n" not in results
 
+
 class TestRemoveBlankAreas:
     @pytest.mark.parametrize("test_dir", [
         remove_all_dir, remove_some_dir, remove_none_dir,
@@ -129,6 +130,7 @@ class TestRemoveBlankAreas:
             expected = ef.readlines()
 
         assert expected == actual
+
 
 class TestFilterManuel:
     @pytest.mark.parametrize("test_dir", [

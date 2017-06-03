@@ -10,11 +10,13 @@ from google.cloud import storage
 
 @pytest.fixture()
 def gcs_client():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"D:\Matt\Documents\google cloud storage\test-backup-validator-auth.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = \
+        r"D:\Matt\Documents\google cloud storage\test-backup-validator-auth.json"
     client = storage.Client()
     yield client
 
 
+# noinspection PyShadowingNames
 class TestBlobSorting:
 
     def test_get_oldest_blob(self, gcs_client):
@@ -37,7 +39,7 @@ class TestBlobSorting:
         assert expected == actual
 
 
-
+# noinspection PyShadowingNames
 class TestValidateMattServerBackupsBucket:
     def test_validate_matt_server_backups_bucket_has_no_warnings(self, gcs_client):
         bucket = gcs_client.get_bucket("test-matt-server-backups")
