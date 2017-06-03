@@ -60,26 +60,25 @@ def validate_bucket(bucket):
         raise ValueError("Unable to handle Bucket " + bucket.name)
 
 
+def validate_giltaji_media_bucket(bucket):
+    pass
+
+
+def validate_giltaji_photos_bucket(bucket):
+    pass
+
+
 def validate_matt_server_backups_bucket(bucket):
-    now = get_localzone().localize(datetime.now())
-    newest = get_newest_blob(bucket.list_blobs())
-    newest_age = now - newest.time_created
-    if newest_age.days > SERVER_BACKUP_NEWEST_AGE_IN_DAYS:
-        warn("The newest file, " + newest.name +
-             ", is more than a week old! Check matt-server-backup cron job.")
-
-    oldest = get_oldest_blob(bucket.list_blobs())
-    oldest_age = now - oldest.time_created
-    if oldest_age.days > SERVER_BACKUP_OLDEST_AGE_IN_DAYS:
-        warn("The oldest file, " + oldest.name +
-             ", is more than 2 months old! Check matt-server-backup lifecycle delete rules.")
-
+    validate_newest_file_in_proper_age_range(bucket)
+    validate_oldest_file_in_proper_age_range(bucket)
     # download most recent 4 files
 
 
-def get_oldest_blob(blobs):
-    sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
-    return sorted_blobs[-1]
+def validate_newest_file_in_proper_age_range(bucket):
+    newest_blob = get_newest_blob(bucket.list_blobs())
+    if get_blob_age_in_days(newest_blob) > SERVER_BACKUP_NEWEST_AGE_IN_DAYS:
+        warn("The newest file, " + newest_blob.name +
+             ", is more than a week old! Check matt-server-backup cron job.")
 
 
 def get_newest_blob(blobs):
@@ -91,12 +90,27 @@ def get_blobs_sorted_newest_to_oldest(blobs):
     return sorted(blobs, key=operator.attrgetter("time_created"), reverse=True)
 
 
-def validate_giltaji_media_bucket(bucket):
-    pass
+def get_blob_age_in_days(blob):
+    now = get_localized_time(datetime.now())
+    age = now - blob.time_created
+    return age.days
 
 
-def validate_giltaji_photos_bucket(bucket):
-    pass
+def get_localized_time(timestamp):
+    return get_localzone().localize(timestamp)
+
+
+def validate_oldest_file_in_proper_age_range(bucket):
+    oldest_blob = get_oldest_blob(bucket.list_blobs())
+    if get_blob_age_in_days(oldest_blob) > SERVER_BACKUP_OLDEST_AGE_IN_DAYS:
+        warn("The oldest file, " + oldest_blob.name +
+             ", is more than 2 months old! Check matt-server-backup lifecycle delete rules.")
+
+
+def get_oldest_blob(blobs):
+    sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
+    return sorted_blobs[-1]
+
 
 
 if __name__ == "__main__":  # pragma: no cover
