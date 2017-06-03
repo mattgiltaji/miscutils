@@ -7,6 +7,7 @@
 # Report success/failure for each bucket
 import argparse
 import os
+import operator
 import sys
 from datetime import datetime, timezone
 from warnings import warn
@@ -18,23 +19,15 @@ SERVER_BACKUP_NEWEST_AGE_IN_DAYS = 7
 NUM_SERVER_BACKUPS_TO_DOWNLOAD = 4
 
 def get_oldest_blob(blobs):
-    oldest = None
-    for blob in blobs:
-        if oldest is None:
-            oldest = blob
-        if blob.time_created < oldest.time_created:
-            oldest = blob
-    return oldest
-
+    sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
+    return sorted_blobs[-1]
 
 def get_newest_blob(blobs):
-    newest = None
-    for blob in blobs:
-        if newest is None:
-            newest = blob
-        if blob.time_created > newest.time_created:
-            newest = blob
-    return newest
+    sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
+    return sorted_blobs[0]
+
+def get_blobs_sorted_newest_to_oldest(blobs):
+    return sorted(blobs, key=operator.attrgetter("time_created"), reverse=True)
 
 
 def validate_giltaji_media_bucket(bucket):
@@ -57,7 +50,7 @@ def validate_matt_server_backups_bucket(bucket):
     if oldest_age.days > SERVER_BACKUP_OLDEST_AGE_IN_DAYS:
         warn("The oldest file, " + oldest.name + ", is more than 2 months old! Check matt-server-backup lifecycle delete rules.")
 
-    # download most recent
+    # download most recent 4 files
 
 
 def validate_bucket(bucket):

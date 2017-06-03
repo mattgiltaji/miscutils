@@ -15,20 +15,27 @@ def gcs_client():
     yield client
 
 
-class TestGetOldestBlob:
+class TestBlobSorting:
 
     def test_get_oldest_blob(self, gcs_client):
         bucket = gcs_client.get_bucket("test-matt-server-backups")
         result = vb.get_oldest_blob(bucket.list_blobs())
         assert result.name == "oldest.txt"
 
-
-class TestGetNewestBlob:
-
     def test_get_newest_blob(self, gcs_client):
         bucket = gcs_client.get_bucket("test-matt-server-backups")
         result = vb.get_newest_blob(bucket.list_blobs())
         assert result.name == "newest.txt"
+
+    def test_get_blobs_sorted_newest_to_oldest(self, gcs_client):
+        bucket = gcs_client.get_bucket("test-matt-server-backups")
+        expected = ["newest.txt", "new2.txt", "new3.txt", "new4.txt",
+                    "mid6.txt", "mid5.txt", "mid4.txt", "mid3.txt", "mid2.txt", "mid1.txt",
+                    "oldest.txt"]
+        results = vb.get_blobs_sorted_newest_to_oldest(bucket.list_blobs())
+        actual = list(result.name for result in results)
+        assert expected == actual
+
 
 
 class TestValidateMattServerBackupsBucket:
