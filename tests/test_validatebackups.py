@@ -7,6 +7,10 @@ import pytest
 import validatebackups.validatebackups as vb
 from google.cloud import storage
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_data_dir = os.path.join(current_dir, "files", "validatebackups")
+matt_server_backups_dir = os.path.join(test_data_dir, "matt-server-backups")
+
 
 @pytest.fixture()
 def gcs_client():
@@ -14,6 +18,18 @@ def gcs_client():
         r"D:\Matt\Documents\google cloud storage\test-backup-validator-auth.json"
     client = storage.Client()
     yield client
+
+
+# noinspection PyShadowingNames
+@pytest.fixture()
+def gcs_fresh_upload(gcs_client):
+    bucket = gcs_client.get_bucket("test-matt-server-backups-fresh")
+    existing_blobs = bucket.list_blobs()
+    if existing_blobs:
+        bucket.delete_blobs(existing_blobs)
+    new_blob = bucket.blob("newest.txt")
+    new_blob.upload_from_filename(os.path.join(matt_server_backups_dir, "newest.txt"))
+    yield gcs_client
 
 
 # noinspection PyShadowingNames
@@ -48,10 +64,23 @@ class TestBlobSorting:
 
 # noinspection PyShadowingNames
 class TestValidateMattServerBackupsBucket:
-    def test_validate_matt_server_backups_bucket_has_no_warnings(self, gcs_client):
-        bucket = gcs_client.get_bucket("test-matt-server-backups")
+    @pytest.mark.skip(reason="file not old enough- try after 6/6")
+    def test_validate_newest_file_throws_warnings_properly(self, gcs_client):
+        bucket = gcs_client.get_bucket("test-matt-server-backups-old")
         with pytest.warns(None) as record:
-            vb.validate_matt_server_backups_bucket(bucket=bucket)
-        assert len(record) == 0
+            vb.validate_newest_file_in_proper_age_range(bucket=bucket)
+        assert len(record) > 0
 
-    # TODO: figure out how to make sure warnings fire when they should
+    @pytest.mark.skip(reason="file not old enough- try after 7/29")
+    def test_validate_oldest_file_throws_warnings_properly(self, gcs_client):
+        bucket = gcs_client.get_bucket("test-matt-server-backups-old")
+        with pytest.warns(None) as record:
+            vb.validate_oldest_file_in_proper_age_range(bucket=bucket)
+        assert len(record) > 0
+
+    def test_validate_fresh_files_has_no_warnings(self, gcs_fresh_upload):
+        bucket = gcs_fresh_upload.get_bucket("test-matt-server-backups-fresh")
+        with pytest.warns(None) as record:
+            vb.validate_newest_file_in_proper_age_range(bucket=bucket)
+            vb.validate_oldest_file_in_proper_age_range(bucket=bucket)
+        assert len(record) == 0

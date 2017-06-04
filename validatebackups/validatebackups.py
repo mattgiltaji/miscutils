@@ -23,7 +23,7 @@ FILE_DOWNLOAD_LOCATION = os.path.join(r"D:\temp\backup_test")
 
 def main():
     """
-    Call parse_args, then pass to validate_backups() fo do all the work
+    Call parse_args, then pass to validate_backups() to do all the work
     :return: nothing
     """
     parse_args(sys.argv[1:])
