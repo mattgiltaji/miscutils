@@ -6,6 +6,7 @@
 # These validation procedures are similar but not identical
 # Report success/failure for each bucket
 import argparse
+import errno
 import os
 import operator
 import sys
@@ -17,6 +18,7 @@ from tzlocal import get_localzone
 SERVER_BACKUP_OLDEST_AGE_IN_DAYS = 60
 SERVER_BACKUP_NEWEST_AGE_IN_DAYS = 7
 NUM_SERVER_BACKUPS_TO_DOWNLOAD = 4
+FILE_DOWNLOAD_LOCATION = os.path.join(r"D:\temp\backup_test")
 
 
 def main():
@@ -71,7 +73,7 @@ def validate_giltaji_photos_bucket(bucket):
 def validate_matt_server_backups_bucket(bucket):
     validate_newest_file_in_proper_age_range(bucket)
     validate_oldest_file_in_proper_age_range(bucket)
-    # download most recent 4 files
+    download_most_recent_files(bucket)
 
 
 def validate_newest_file_in_proper_age_range(bucket):
@@ -111,6 +113,41 @@ def get_oldest_blob(blobs):
     sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
     return sorted_blobs[-1]
 
+
+def download_most_recent_files(bucket):
+    blobs_to_download = get_most_recent_blobs_to_download(bucket.list_blobs())
+    download_blobs(blobs_to_download)
+
+
+def get_most_recent_blobs_to_download(blobs):
+    sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
+    return sorted_blobs[:NUM_SERVER_BACKUPS_TO_DOWNLOAD]
+
+
+def download_blobs(blobs):
+    for blob in blobs:
+        download_blob(blob)
+
+
+def download_blob(blob):
+    file_location = get_download_location_for_blob(blob)
+    create_missing_directories(file_location)
+    blob.download_to_filename(file_location)
+
+
+def get_download_location_for_blob(blob):
+    bucket_name = blob.bucket.name
+    blob_name = blob.name
+    return os.path.join(FILE_DOWNLOAD_LOCATION, bucket_name, blob_name)
+
+
+def create_missing_directories(file_path):
+    dir_only_file_path = os.path.dirname(file_path)
+    try:
+        os.makedirs(dir_only_file_path, exist_ok=True)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
 
 if __name__ == "__main__":  # pragma: no cover

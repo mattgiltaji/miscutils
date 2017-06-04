@@ -38,6 +38,13 @@ class TestBlobSorting:
         actual = list(result.name for result in results)
         assert expected == actual
 
+    def test_get_most_recent_blobs_to_download(self, gcs_client):
+        bucket = gcs_client.get_bucket("test-matt-server-backups")
+        expected = ["newest.txt", "new2.txt", "new3.txt", "new4.txt"]
+        results = vb.get_most_recent_blobs_to_download(bucket.list_blobs())
+        actual = list(result.name for result in results)
+        assert expected == actual
+
 
 # noinspection PyShadowingNames
 class TestValidateMattServerBackupsBucket:
