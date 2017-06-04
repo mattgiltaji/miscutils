@@ -125,7 +125,8 @@ class TestValidateMattServerBackupsBucket:
             vb.validate_oldest_file_in_proper_age_range(bucket=fresh_backup_bucket_with_uploads)
         assert len(record) == 0
 
-    def test_validate_matt_server_backups_bucket(self, fresh_backup_bucket_with_downloads):
+    @pytest.mark.slowtest
+    def test_validate_matt_server_backups_downloads_files(self, fresh_backup_bucket_with_downloads):
         expected = ["mid1.txt", "mid2.txt", "mid3.txt", "mid4.txt"]
         vb.download_most_recent_files(fresh_backup_bucket_with_downloads)
         actual_files = os.listdir(matt_server_backups_download_dir)
