@@ -9,6 +9,7 @@ import argparse
 import errno
 import os
 import operator
+import random
 import sys
 from datetime import datetime
 from warnings import warn
@@ -19,6 +20,9 @@ OLDEST_SERVER_BACKUP_FILE_MAX_AGE_IN_DAYS = 60
 NEWEST_SERVER_BACKUP_FILE_MAX_AGE_IN_DAYS = 7
 NUM_SERVER_BACKUPS_TO_DOWNLOAD = 4
 FILE_DOWNLOAD_LOCATION = os.path.join(r"D:\temp\backup_test")
+NUM_MEDIA_FILES_TO_DOWNLOAD = 5
+NUM_PHOTOS_FROM_THIS_MONTH_TO_DOWNLOAD = 5
+NUM_PHOTOS_FROM_EACH_YEAR_TO_DOWNLOAD = 10
 
 
 def main():
@@ -63,11 +67,72 @@ def validate_bucket(bucket):
 
 
 def validate_giltaji_media_bucket(bucket):
+    # for each top level folder
+    #  select random sample of files -> NUM_MEDIA_FILES_TO_DOWNLOAD
+    #  download those files
     pass
 
 
 def validate_giltaji_photos_bucket(bucket):
-    pass
+    download_random_photos_from_this_month(bucket)
+    download_random_photos_from_each_year(bucket)
+
+
+def download_random_photos_from_this_month(bucket):
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+    blobs = get_random_sample_of_blobs(
+        bucket=bucket,
+        filter_criteria=str(current_year) + "-" + str(current_month),
+        sample_size=NUM_PHOTOS_FROM_THIS_MONTH_TO_DOWNLOAD
+    )
+    download_blobs(blobs)
+
+
+def download_blobs(blobs):
+    for blob in blobs:
+        download_blob(blob)
+
+
+def download_blob(blob):
+    file_location = get_download_location_for_blob(blob)
+    create_missing_directories(file_location)
+    blob.download_to_filename(file_location)
+
+
+def get_download_location_for_blob(blob):
+    bucket_name = blob.bucket.name
+    blob_name = blob.name
+    return os.path.join(FILE_DOWNLOAD_LOCATION, bucket_name, blob_name)
+
+
+def create_missing_directories(file_path):
+    dir_only_file_path = os.path.dirname(file_path)
+    try:
+        os.makedirs(dir_only_file_path, exist_ok=True)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+
+def get_random_sample_of_blobs(bucket, filter_criteria, sample_size):
+    filtered_blobs = bucket.list_blobs(prefix=filter_criteria)
+    return random.sample(population=filtered_blobs, k=sample_size)
+
+
+def download_random_photos_from_each_year(bucket):
+    current_year = datetime.now().year
+    for year in range(2010, current_year+1):
+        download_random_photos_from_specific_year(year, bucket)
+
+
+def download_random_photos_from_specific_year(year, bucket):
+    blobs = get_random_sample_of_blobs(
+        bucket=bucket,
+        filter_criteria=str(year) + "-",
+        sample_size=NUM_PHOTOS_FROM_EACH_YEAR_TO_DOWNLOAD
+    )
+    download_blobs(blobs)
 
 
 def validate_matt_server_backups_bucket(bucket):
@@ -125,31 +190,6 @@ def get_most_recent_blobs_to_download(blobs):
     sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
     return sorted_blobs[:NUM_SERVER_BACKUPS_TO_DOWNLOAD]
 
-
-def download_blobs(blobs):
-    for blob in blobs:
-        download_blob(blob)
-
-
-def download_blob(blob):
-    file_location = get_download_location_for_blob(blob)
-    create_missing_directories(file_location)
-    blob.download_to_filename(file_location)
-
-
-def get_download_location_for_blob(blob):
-    bucket_name = blob.bucket.name
-    blob_name = blob.name
-    return os.path.join(FILE_DOWNLOAD_LOCATION, bucket_name, blob_name)
-
-
-def create_missing_directories(file_path):
-    dir_only_file_path = os.path.dirname(file_path)
-    try:
-        os.makedirs(dir_only_file_path, exist_ok=True)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
 
 
 if __name__ == "__main__":  # pragma: no cover
