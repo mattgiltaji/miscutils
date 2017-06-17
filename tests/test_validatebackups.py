@@ -107,7 +107,6 @@ class TestBlobSorting:
 
 # noinspection PyShadowingNames
 class TestValidateMattServerBackupsBucket:
-    @pytest.mark.skip(reason="file not old enough- try after 6/6")
     def test_validate_newest_file_throws_warnings_properly(self, old_backup_bucket):
         with pytest.warns(None) as record:
             vb.validate_newest_file_in_proper_age_range(bucket=old_backup_bucket)
