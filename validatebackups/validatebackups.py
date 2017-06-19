@@ -78,12 +78,14 @@ class BackupValidator:
             raise ValueError("Unable to handle Bucket " + bucket.name)
 
     def validate_giltaji_media_bucket(self):
-        folders = self.get_top_level_folders()
+        folders = self.get_top_level_media_folders()
         self.download_random_media_files_from_each_folder(folders)
 
-    def get_top_level_folders(self):
-        # TODO: update this when https://github.com/GoogleCloudPlatform/google-cloud-python/issues/920 is resolved
-        return []
+    def get_top_level_media_folders(self):
+        # TODO: revisit this when https://github.com/GoogleCloudPlatform/google-cloud-python/issues/920 is resolved
+        blobs = self.media_bucket.list_blobs(delimiter='/')
+        list(blobs)  # needed to populate prefixes
+        return blobs.prefixes
 
     def download_random_media_files_from_each_folder(self, folders):
         for folder in folders:

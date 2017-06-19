@@ -9,6 +9,7 @@ from google.cloud import storage
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_data_dir = os.path.join(current_dir, "files", "validatebackups")
+matt_media_dir = os.path.join(test_data_dir, "matt-media")
 matt_server_backups_dir = os.path.join(test_data_dir, "matt-server-backups")
 matt_server_backups_download_dir = os.path.join(BackupValidator.FILE_DOWNLOAD_LOCATION,
                                                 "test-matt-server-backups-fresh")
@@ -20,6 +21,13 @@ def validator():
         r"D:\Matt\Documents\google cloud storage\test-backup-validator-auth.json"
     backup_validator = BackupValidator(client=storage.Client())
     yield backup_validator
+
+
+# noinspection PyShadowingNames
+@pytest.fixture
+def test_media_validator(validator):
+    validator.media_bucket = validator.client.get_bucket("test-matt-media")
+    yield validator
 
 
 # noinspection PyShadowingNames
@@ -80,6 +88,14 @@ def delete_existing_files_from_directory(directory_location):
             os.remove(file)
     except FileNotFoundError:
         pass
+
+
+class TestMediaBucket:
+
+    def test_get_top_level_folders(self, test_media_validator):
+        expected = {"show 1/", "show 2/", "show 3/"}
+        actual = test_media_validator.get_top_level_media_folders()
+        assert expected == actual
 
 
 class TestPhotosBucket:
