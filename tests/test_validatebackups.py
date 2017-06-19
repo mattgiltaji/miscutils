@@ -10,6 +10,7 @@ from google.cloud import storage
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_data_dir = os.path.join(current_dir, "files", "validatebackups")
 matt_media_dir = os.path.join(test_data_dir, "matt-media")
+matt_media_download_dir = os.path.join(BackupValidator.FILE_DOWNLOAD_LOCATION, "test-matt-media")
 matt_server_backups_dir = os.path.join(test_data_dir, "matt-server-backups")
 matt_server_backups_download_dir = os.path.join(BackupValidator.FILE_DOWNLOAD_LOCATION,
                                                 "test-matt-server-backups-fresh")
@@ -28,6 +29,13 @@ def validator():
 def test_media_validator(validator):
     validator.media_bucket = validator.client.get_bucket("test-matt-media")
     yield validator
+
+
+# noinspection PyShadowingNames
+@pytest.fixture
+def test_media_validator_with_downloads(test_media_validator):
+    delete_existing_files_from_directory(matt_media_download_dir)
+    yield test_media_validator
 
 
 # noinspection PyShadowingNames
@@ -90,11 +98,35 @@ def delete_existing_files_from_directory(directory_location):
         pass
 
 
+# noinspection PyShadowingNames
 class TestMediaBucket:
 
     def test_get_top_level_folders(self, test_media_validator):
         expected = {"show 1/", "show 2/", "show 3/"}
         actual = test_media_validator.get_top_level_media_folders()
+        assert expected == actual
+
+    @pytest.mark.slowtest
+    def test_validate_giltaji_media_bucket_downloads_files(self, test_media_validator_with_downloads):
+        expected_relative_paths = [os.path.join("show 1","season 1","01x01 episode.ogv"),
+                                   os.path.join("show 1","season 1","S01E22 episode.ogv"),
+                                   os.path.join("show 1","season 2","s02e02 - episode.ogv"),
+                                   os.path.join("show 2","season 3","03x03 - episode.ogv"),
+                                   os.path.join("show 2","season 5","05x01 episode.ogv"),
+                                   os.path.join("show 2","season 7","S07E77 episode.ogv"),
+                                   os.path.join("show 3", "season 1000", "s1000e947 - episode.ogv"),
+                                   os.path.join("show 3","specials","00x01 making of episode.ogv"),
+                                   os.path.join("show 3","specials","s00e03 - holiday special.ogv")
+                                   ]
+        expected = []
+        for path in expected_relative_paths:
+            expected.append(os.path.join(matt_media_download_dir, path))
+
+        test_media_validator_with_downloads.validate_giltaji_media_bucket()
+        actual = []
+        for path, subdirs, files in os.walk(matt_media_download_dir):
+            for filename in files:
+                actual.append(os.path.join(path, filename))
         assert expected == actual
 
 

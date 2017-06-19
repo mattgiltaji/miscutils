@@ -101,7 +101,7 @@ class BackupValidator:
 
     @staticmethod
     def get_random_sample_of_blobs(bucket, filter_criteria, sample_size):
-        filtered_blobs = bucket.list_blobs(prefix=filter_criteria)
+        filtered_blobs = list(bucket.list_blobs(prefix=filter_criteria))
         return random.sample(population=filtered_blobs, k=sample_size)
 
     @classmethod
