@@ -41,6 +41,14 @@ def test_media_validator_with_downloads(test_media_validator):
     yield test_media_validator
 
 
+def delete_existing_files_from_directory(directory_location):
+    try:
+        for file in os.listdir(directory_location):
+            os.remove(file)
+    except FileNotFoundError:
+        pass
+
+
 # noinspection PyShadowingNames
 @pytest.fixture
 def test_year_photos_validator(validator):
@@ -58,13 +66,24 @@ def test_month_photos_validator(validator):
 
     current_year = datetime.now().year
     current_month = datetime.now().month
-    # need to upload several files with very specific filename and paths
-    #   current_year-current_month/IMG_N.gif to be specific
-    # upload_new_file_to_bucket(
-    #     bucket=validator.photos_bucket,
-    #     file_location=os.path.join(matt_server_backups_dir, "newest.txt")
-    # )
+    subfolder_name = TestPhotosBucket.get_subfolder_name_from_year_and_month(current_year, current_month)
+
+    for number in range(1, BackupValidator.NUM_PHOTOS_FROM_THIS_MONTH_TO_DOWNLOAD + 1):
+        # need to upload several files with very specific filename and paths
+        #   current_year-current_month/IMG_N.gif to be specific
+        filename = TestPhotosBucket.get_image_filename_from_number(number)
+        upload_new_file_to_bucket(
+            bucket=validator.photos_bucket,
+            file_location=os.path.join(matt_photos_dir, "Red_1x1.gif"),
+            upload_location=subfolder_name + "/" + filename
+        )
     yield validator
+
+
+def delete_existing_blobs_from_bucket(bucket):
+    existing_blobs = bucket.list_blobs()
+    if existing_blobs:
+        bucket.delete_blobs(existing_blobs)
 
 
 # noinspection PyShadowingNames
@@ -81,6 +100,13 @@ def old_backup_validator(validator):
     yield validator
 
 
+def upload_new_file_to_bucket(bucket, file_location, upload_location=None):
+    if upload_location is None:
+        upload_location = os.path.basename(file_location)
+    blob = bucket.blob(upload_location)
+    blob.upload_from_filename(file_location)
+
+
 # noinspection PyShadowingNames
 @pytest.fixture
 def fresh_backup_validator_with_uploads(validator):
@@ -91,17 +117,6 @@ def fresh_backup_validator_with_uploads(validator):
         file_location=os.path.join(matt_server_backups_dir, "newest.txt")
     )
     yield validator
-
-
-def delete_existing_blobs_from_bucket(bucket):
-    existing_blobs = bucket.list_blobs()
-    if existing_blobs:
-        bucket.delete_blobs(existing_blobs)
-
-
-def upload_new_file_to_bucket(bucket, file_location):
-    blob = bucket.blob(os.path.basename(file_location))
-    blob.upload_from_filename(file_location)
 
 
 # noinspection PyShadowingNames
@@ -117,14 +132,6 @@ def fresh_backup_validator_with_downloads(validator):
         )
 
     yield validator
-
-
-def delete_existing_files_from_directory(directory_location):
-    try:
-        for file in os.listdir(directory_location):
-            os.remove(file)
-    except FileNotFoundError:
-        pass
 
 
 # noinspection PyShadowingNames
