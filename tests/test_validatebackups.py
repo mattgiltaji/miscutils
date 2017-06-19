@@ -10,7 +10,8 @@ from google.cloud import storage
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_data_dir = os.path.join(current_dir, "files", "validatebackups")
 matt_server_backups_dir = os.path.join(test_data_dir, "matt-server-backups")
-matt_server_backups_download_dir = os.path.join(BackupValidator.FILE_DOWNLOAD_LOCATION, "test-matt-server-backups-fresh")
+matt_server_backups_download_dir = os.path.join(BackupValidator.FILE_DOWNLOAD_LOCATION,
+                                                "test-matt-server-backups-fresh")
 
 
 @pytest.fixture
@@ -85,6 +86,7 @@ class TestPhotosBucket:
 
     def test_validate_giltaji_photos_bucket(self):
         pass
+
 
 # noinspection PyShadowingNames
 class TestBlobSorting:
