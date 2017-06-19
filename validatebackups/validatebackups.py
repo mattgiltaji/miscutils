@@ -139,7 +139,7 @@ class BackupValidator:
         current_month = datetime.now().month
         blobs = BackupValidator.get_random_sample_of_blobs(
             bucket=self.photos_bucket,
-            filter_criteria=str(current_year) + "-" + str(current_month),
+            filter_criteria=str(current_year) + "-" + str(current_month).zfill(2),
             sample_size=self.NUM_PHOTOS_FROM_THIS_MONTH_TO_DOWNLOAD
         )
         self.download_blobs(blobs)

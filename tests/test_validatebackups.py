@@ -6,6 +6,7 @@ import pytest
 
 from validatebackups.validatebackups import BackupValidator
 from google.cloud import storage
+from datetime import datetime
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_data_dir = os.path.join(current_dir, "files", "validatebackups")
@@ -45,6 +46,24 @@ def test_media_validator_with_downloads(test_media_validator):
 def test_year_photos_validator(validator):
     validator.photos_bucket = validator.client.get_bucket("test-matt-photos")
     delete_existing_files_from_directory(matt_year_photos_download_dir)
+    yield validator
+
+
+# noinspection PyShadowingNames
+@pytest.fixture
+def test_month_photos_validator(validator):
+    validator.photos_bucket = validator.client.get_bucket("test-matt-photos-fresh")
+    delete_existing_files_from_directory(matt_month_photos_download_dir)
+    delete_existing_blobs_from_bucket(validator.photos_bucket)
+
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+    # need to upload several files with very specific filename and paths
+    #   current_year-current_month/IMG_N.gif to be specific
+    # upload_new_file_to_bucket(
+    #     bucket=validator.photos_bucket,
+    #     file_location=os.path.join(matt_server_backups_dir, "newest.txt")
+    # )
     yield validator
 
 
@@ -204,11 +223,13 @@ class TestPhotosBucket:
         # for number in range(1, max_file_num_per_year):
         #    paths.append(self.get_path_from_year_month_and_number(2018, 5, number))
 
-        return paths
+        expected = []
+        for path in paths:
+            expected.append(os.path.join(matt_year_photos_download_dir, path))
+        return expected
 
     def get_path_from_year_month_and_number(self, year, month, number):
-        return os.path.join(matt_year_photos_download_dir,
-                            self.get_subfolder_name_from_year_and_month(year, month),
+        return os.path.join(self.get_subfolder_name_from_year_and_month(year, month),
                             self.get_image_filename_from_number(number))
 
     @staticmethod
@@ -218,6 +239,28 @@ class TestPhotosBucket:
     @staticmethod
     def get_image_filename_from_number(number):
         return "IMG_" + str(number).zfill(2) + ".gif"
+
+    @pytest.mark.slowtest
+    def test_download_random_photos_from_this_month_downloads_files(self, test_month_photos_validator):
+        expected = self.get_static_month_downloads_expected_file_paths()
+        test_month_photos_validator.download_random_photos_from_this_month()
+        actual = []
+        for path, subdirs, files in os.walk(matt_month_photos_download_dir):
+            for filename in files:
+                actual.append(os.path.join(path, filename))
+        assert expected == actual
+
+    def get_static_month_downloads_expected_file_paths(self):
+        paths = []
+        max_file_num_per_month = BackupValidator.NUM_PHOTOS_FROM_THIS_MONTH_TO_DOWNLOAD + 1
+        current_year = datetime.now().year
+        current_month = datetime.now().month
+        for number in range(1, max_file_num_per_month):
+            paths.append(self.get_path_from_year_month_and_number(current_year, current_month, number))
+        expected = []
+        for path in paths:
+            expected.append(os.path.join(matt_month_photos_download_dir, path))
+        return expected
 
 
 # noinspection PyShadowingNames
