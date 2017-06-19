@@ -82,6 +82,7 @@ class BackupValidator:
         self.download_random_media_files_from_each_folder(folders)
 
     def get_top_level_folders(self):
+        # TODO: update this when https://github.com/GoogleCloudPlatform/google-cloud-python/issues/920 is resolved
         return []
 
     def download_random_media_files_from_each_folder(self, folders):
@@ -89,9 +90,12 @@ class BackupValidator:
             self.download_random_media_files_from_folder(folder)
 
     def download_random_media_files_from_folder(self, folder):
-        pass
-        #  select random sample of files -> NUM_MEDIA_FILES_TO_DOWNLOAD
-        #  download those files
+        blobs = self.get_random_sample_of_blobs(
+            bucket=self.media_bucket,
+            filter_criteria=folder,
+            sample_size=self.NUM_MEDIA_FILES_TO_DOWNLOAD
+        )
+        BackupValidator.download_blobs(blobs)
 
     @staticmethod
     def get_random_sample_of_blobs(bucket, filter_criteria, sample_size):
