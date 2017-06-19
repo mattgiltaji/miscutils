@@ -79,6 +79,11 @@ def delete_existing_files_from_directory(directory_location):
         pass
 
 
+class TestPhotosBucket:
+
+    def test_validate_giltaji_photos_bucket(self):
+        pass
+
 # noinspection PyShadowingNames
 class TestBlobSorting:
 

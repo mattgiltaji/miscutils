@@ -67,10 +67,23 @@ def validate_bucket(bucket):
 
 
 def validate_giltaji_media_bucket(bucket):
-    # for each top level folder
+    folders = get_top_level_folders(bucket)
+    download_random_media_files_from_each_folder(bucket, folders)
+
+
+def get_top_level_folders(bucket):
+    return []
+
+
+def download_random_media_files_from_each_folder(bucket, folders):
+    for folder in folders:
+        download_random_media_files_from_folder(bucket, folder)
+
+
+def download_random_media_files_from_folder(bucket, folder):
+    pass
     #  select random sample of files -> NUM_MEDIA_FILES_TO_DOWNLOAD
     #  download those files
-    pass
 
 
 def validate_giltaji_photos_bucket(bucket):
@@ -189,7 +202,6 @@ def download_most_recent_files(bucket):
 def get_most_recent_blobs_to_download(blobs):
     sorted_blobs = get_blobs_sorted_newest_to_oldest(blobs)
     return sorted_blobs[:NUM_SERVER_BACKUPS_TO_DOWNLOAD]
-
 
 
 if __name__ == "__main__":  # pragma: no cover
