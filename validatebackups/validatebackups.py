@@ -7,6 +7,7 @@
 # Report success/failure for each bucket
 import argparse
 import errno
+import logging
 import os
 import operator
 import random
@@ -43,6 +44,29 @@ def validate_backups():
     backup_validator.validate_backups()
 
 
+def get_logger():
+    logger = logging.getLogger("validatebackups.py")
+    configure_logging(logger)
+    return logger
+
+
+def configure_logging(logger):
+    logger.setLevel(logging.INFO)
+    if not logger.hasHandlers():
+        add_console_logging(logger)
+
+
+def add_console_logging(logger):
+    console_handler = logging.StreamHandler(sys.stdout)
+    format = get_logging_format()
+    console_handler.setFormatter(format)
+    logger.addHandler(console_handler)
+
+
+def get_logging_format():
+    return logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+
 class BackupValidator:
     FILE_DOWNLOAD_LOCATION = os.path.join(r"D:\temp\backup_test")
     OLDEST_SERVER_BACKUP_FILE_MAX_AGE_IN_DAYS = 60
@@ -59,6 +83,8 @@ class BackupValidator:
         self.server_backups_bucket = server_backups_bucket
 
     def validate_backups(self):
+        logger = get_logger()
+        logger.info("Validating all buckets.")
         for bucket in self.client.list_buckets():
             self.validate_bucket(bucket)
 
@@ -78,6 +104,8 @@ class BackupValidator:
             raise ValueError("Unable to handle Bucket " + bucket.name)
 
     def validate_giltaji_media_bucket(self):
+        logger = get_logger()
+        logger.info("Validating media style bucket - {bucket}".format(bucket=self.media_bucket))
         folders = self.get_top_level_media_folders()
         self.download_random_media_files_from_each_folder(folders)
 
@@ -113,6 +141,8 @@ class BackupValidator:
     def download_blob(cls, blob):
         file_location = cls.get_download_location_for_blob(blob)
         BackupValidator.create_missing_directories(file_location)
+        logger = get_logger()
+        logger.info("Downloading {file} to {location}".format(file=blob.name, location=file_location))
         blob.download_to_filename(file_location)
 
     @staticmethod
@@ -131,6 +161,8 @@ class BackupValidator:
         return os.path.join(cls.FILE_DOWNLOAD_LOCATION, bucket_name, blob_name)
 
     def validate_giltaji_photos_bucket(self):
+        logger = get_logger()
+        logger.info("Validating photos style bucket - {bucket}".format(bucket=self.photos_bucket))
         self.download_random_photos_from_this_month()
         self.download_random_photos_from_each_year()
 
@@ -158,6 +190,8 @@ class BackupValidator:
         self.download_blobs(blobs)
 
     def validate_matt_server_backups_bucket(self):
+        logger = get_logger()
+        logger.info("Validating server backups style bucket - {bucket}".format(bucket=self.server_backups_bucket))
         self.validate_newest_file_in_proper_age_range()
         self.validate_oldest_file_in_proper_age_range()
         self.download_most_recent_server_backups()
