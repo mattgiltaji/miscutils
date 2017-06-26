@@ -10,7 +10,7 @@ encrypt_file() {
 	
 	encrypted_file=$orig_file.gpg
 	echo "encrypting $orig_file"
-	gpg --encrypt --recipient $RECIPIENT $orig_file
+	gpg2 --encrypt --recipient $RECIPIENT $orig_file
 
 	if [ ! -e "$encrypted_file" ] || [ ! -s "$encrypted_file" ]
 	then
