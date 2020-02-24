@@ -1,5 +1,5 @@
 # do the sync
-gsutil -m cp -n -r D:\Matt\Pictures\201* gs://giltaji-photos/
+gsutil -m cp -n -r D:\Matt\Pictures\20* gs://giltaji-photos/
 
 # let pushmon know we succeeded
 $urlString = "http://pshmn.com/WMgnwq"
