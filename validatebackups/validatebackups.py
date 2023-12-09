@@ -92,12 +92,14 @@ class BackupValidator:
         if bucket.name == "giltaji-media":
             self.media_bucket = bucket
             self.validate_giltaji_media_bucket()
+            # pass
         elif bucket.name == "giltaji-photos":
             self.photos_bucket = bucket
             self.validate_giltaji_photos_bucket()
         elif bucket.name == "matt-server-backups":
             self.server_backups_bucket = bucket
             self.validate_matt_server_backups_bucket()
+            # pass
         elif bucket.name == "giltajidjangobackups":
             pass
         else:
