@@ -1,3 +1,6 @@
+# auth with service account
+$env:CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE = "D:\Matt\OneDrive\Documents\keys\nightly-pc-backup-private.json"
+
 # do the sync
 gcloud storage cp -n -r D:\Matt\OneDrive\Pictures\202* gs://giltaji-photos/
 gcloud storage cp -n -r D:\Matt\OneDrive\Pictures\blase* gs://giltaji-misc/
